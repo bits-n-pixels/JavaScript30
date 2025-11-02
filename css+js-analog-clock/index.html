@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS + JS Analog Clock with CSS Variables</title>
+    <style>
+        body {
+            background: radial-gradient(circle at center, #0f2027, #203a43, #2c5364);
+            color: white;
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .clock {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        .clock-face {
+            position: relative;
+            margin: auto;
+            width: 350px;
+            height: 350px;
+            border: 10px solid rgba(31, 186, 210, 0.8);
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(31, 186, 210, 0.4);
+            overflow: visible;
+        }
+
+        .hand {
+            height: 6px;
+            background-color: rgb(107, 153, 160);
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform-origin: 100%;
+            width: 50%;
+            transition: all 0.05s;
+            transition-timing-function: cubic-bezier(0.1, 2.7, 0.58, 1);
+        }
+
+        .minute-hand {
+            background-color: rgb(13, 91, 103);
+        }
+
+        .hour-hand {
+            background-color: rgb(27, 55, 59);
+        }
+
+        /* Numbers Positioned Using CSS Variable --i */
+        .number {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: rotate(calc(var(--i) * 30deg)) translateY(-150px) rotate(calc(var(--i) * -30deg));
+            transform-origin: center;
+            font-size: 22px;
+            font-weight: bold;
+            opacity: 0;
+            animation: fadeIn 1s ease forwards;
+            animation-delay: calc(var(--i) * 0.1s);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8) rotate(calc(var(--i) * 30deg)) translateY(-150px) rotate(calc(var(--i) * -30deg));
+            }
+
+            to {
+                opacity: 1;
+                transform: rotate(calc(var(--i) * 30deg)) translateY(-150px) rotate(calc(var(--i) * -30deg));
+            }
+        }
+
+        /* Decorative Glow Dots Using --i */
+        .dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 6px;
+            height: 6px;
+            background: rgba(31, 186, 210, 0.8);
+            border-radius: 50%;
+            transform: rotate(calc(var(--i) * 30deg)) translateY(-165px);
+            animation: spinGlow 6s linear infinite;
+            animation-delay: calc(var(--i) * 0.2s);
+        }
+
+        @keyframes spinGlow {
+            0% {
+                opacity: 0.5;
+                transform: rotate(calc(var(--i) * 30deg)) translateY(-165px) scale(1);
+            }
+
+            50% {
+                opacity: 1;
+                transform: rotate(calc(var(--i) * 30deg)) translateY(-165px) scale(1.4);
+            }
+
+            100% {
+                opacity: 0.5;
+                transform: rotate(calc(var(--i) * 30deg)) translateY(-165px) scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="clock">
+        <h2>CSS + JS Clock</h2>
+        <div class="clock-face">
+            <div class="hand hour-hand"></div>
+            <div class="hand minute-hand"></div>
+            <div class="hand second-hand"></div>
+
+            <!-- Numbers -->
+            <div class="number" style="--i:1">1</div>
+            <div class="number" style="--i:2">2</div>
+            <div class="number" style="--i:3">3</div>
+            <div class="number" style="--i:4">4</div>
+            <div class="number" style="--i:5">5</div>
+            <div class="number" style="--i:6">6</div>
+            <div class="number" style="--i:7">7</div>
+            <div class="number" style="--i:8">8</div>
+            <div class="number" style="--i:9">9</div>
+            <div class="number" style="--i:10">10</div>
+            <div class="number" style="--i:11">11</div>
+            <div class="number" style="--i:12">12</div>
+
+            <!-- Decorative glow dots -->
+            <div class="dot" style="--i:1"></div>
+            <div class="dot" style="--i:2"></div>
+            <div class="dot" style="--i:3"></div>
+            <div class="dot" style="--i:4"></div>
+            <div class="dot" style="--i:5"></div>
+            <div class="dot" style="--i:6"></div>
+            <div class="dot" style="--i:7"></div>
+            <div class="dot" style="--i:8"></div>
+            <div class="dot" style="--i:9"></div>
+            <div class="dot" style="--i:10"></div>
+            <div class="dot" style="--i:11"></div>
+            <div class="dot" style="--i:12"></div>
+        </div>
+    </div>
+
+    <script>
+        function setDate() {
+            const now = new Date();
+            const seconds = now.getSeconds();
+            const minutes = now.getMinutes();
+            const hour = now.getHours();
+
+            const secondsDegrees = ((seconds / 60) * 360) + 90;
+            const minutesDegrees = ((minutes / 60) * 360) + 90;
+            const hourDegrees = ((hour / 12) * 360) + ((minutes / 60) * 30) + 90;
+
+            const secondsHand = document.querySelector(".second-hand");
+            const minutesHand = document.querySelector(".minute-hand");
+            const hourHand = document.querySelector(".hour-hand");
+
+            secondsHand.style.transform = `rotate(${secondsDegrees}deg)`;
+            minutesHand.style.transform = `rotate(${minutesDegrees}deg)`;
+            hourHand.style.transform = `rotate(${hourDegrees}deg)`;
+
+            // Fix snapping glitch at reset
+            if (secondsDegrees === 90) {
+                secondsHand.style.transition = 'none';
+            } else {
+                secondsHand.style.transition = 'all 0.05s cubic-bezier(0.1, 2.7, 0.58, 1)';
+            }
+        }
+
+        setInterval(setDate, 1000);
+        setDate();
+    </script>
+</body>
+
+</html>
